@@ -6,10 +6,10 @@
 	</PropertyGroup>
 
 	<PropertyGroup>
-		<Title>KamiYomu Crawler Agent – mangafire.to</Title>
+		<Title>Pimans KamiYomu Crawler Agent – mangafire.to</Title>
 		<Description>A dedicated crawler agent for accessing public data from mangafire.to. Built on KamiYomu.CrawlerAgents.Core, it enables efficient search, metadata extraction, and integration with the KamiYomu platform.</Description>
-		<Authors>Ghost</Authors>
-		<Owners>Ghost</Owners>
+		<Authors>Piman</Authors>
+		<Owners>Piman</Owners>
 		<PackageProjectUrl>https://gitea.kamiyomu.com/kamiyomu/KamiYomu.CrawlerAgents.MangaFire</PackageProjectUrl>
 		<RepositoryUrl>https://gitea.kamiyomu.com/kamiyomu/KamiYomu.CrawlerAgents.MangaFire.git</RepositoryUrl>
 		<RepositoryType>git</RepositoryType>
@@ -36,6 +36,6 @@
 		<PackageReference Include="KamiYomu.CrawlerAgents.Core" Version="1.1.4" />
 	</ItemGroup>
 
-	<Import Project="KamiYomu.CrawlerAgents.MangaFire.props" />
+	<Import Project="Piman.CrawlerAgents.MangaFire.props" />
 
 </Project>

@@ -15,8 +15,9 @@ using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using System.Web;
 using Page = KamiYomu.CrawlerAgents.Core.Catalog.Page;
+using Core = KamiYomu.CrawlerAgents.Core;
 
-namespace KamiYomu.CrawlerAgents.MangaFire;
+namespace Piman.CrawlerAgents.MangaFire;
 
 [DisplayName("KamiYomu Crawler Agent – mangafire.to")]
 [CrawlerSelect("Language", "Chapter Translation language, translated fields such as Titles and Descriptions", true, 1, [
@@ -109,7 +110,7 @@ public class MangaFireCrawlerAgent : AbstractCrawlerAgent, ICrawlerAgent, IAsync
 
     public Task<Uri> GetFaviconAsync(CancellationToken cancellationToken)
     {
-        return Task.FromResult(new Uri("https://s.mfcdn.cc/assets/sites/mangafire/favicon.png"));
+        return Task.FromResult(new Uri("https://s.mfcdn.nl/assets/sites/mangafire/favicon.png"));
     }
 
     public async Task<PagedResult<Manga>> SearchAsync(string titleName, PaginationOptions paginationOptions, CancellationToken cancellationToken)
@@ -341,7 +342,7 @@ public class MangaFireCrawlerAgent : AbstractCrawlerAgent, ICrawlerAgent, IAsync
             Timeout = TimeoutMilliseconds
         });
 
-        await page.WaitForSelectorAsync("#progress-bar");
+        await page.WaitForSelectorAsync(".loaded");
 
         // Get total number of pages from progress-bar
         int totalPages = await page.EvaluateFunctionAsync<int>(@"
