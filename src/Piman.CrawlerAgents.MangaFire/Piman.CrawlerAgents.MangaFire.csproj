@@ -10,12 +10,12 @@
 		<Description>A dedicated crawler agent for accessing public data from mangafire.to. Built on KamiYomu.CrawlerAgents.Core, it enables efficient search, metadata extraction, and integration with the KamiYomu platform.</Description>
 		<Authors>Piman</Authors>
 		<Owners>Piman</Owners>
-		<PackageProjectUrl>https://gitea.kamiyomu.com/kamiyomu/KamiYomu.CrawlerAgents.MangaFire</PackageProjectUrl>
-		<RepositoryUrl>https://gitea.kamiyomu.com/kamiyomu/KamiYomu.CrawlerAgents.MangaFire.git</RepositoryUrl>
+		<PackageProjectUrl>https://github.com/piman13/Piman.CrawlerAgents.MangaFire</PackageProjectUrl>
+		<RepositoryUrl>https://github.com/piman13/Piman.CrawlerAgents.MangaFire.git</RepositoryUrl>
 		<RepositoryType>git</RepositoryType>
 		<PackageTags>kamiyomu;kamiyomu-crawler-agents;manga-download;MangaFire</PackageTags>
 		<PackageLicenseExpression>AGPL-3.0-only</PackageLicenseExpression>
-		<PackageIconUrl>https://gitea.kamiyomu.com/kamiyomu/KamiYomu.CrawlerAgents.MangaFire/raw/branch/main/src/KamiYomu.CrawlerAgents.MangaFire/Resources/logo.png</PackageIconUrl>
+		<PackageIconUrl>https://raw.githubusercontent.com/piman13/Piman.CrawlerAgents.MangaFire/refs/heads/main/src/Piman.CrawlerAgents.MangaFire/Resources/logo.png</PackageIconUrl>
 		<PackageIcon>Resources/logo.png</PackageIcon>
 		<PackageReadmeFile>README.md</PackageReadmeFile>
 	</PropertyGroup>
