@@ -3,7 +3,7 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.14.36705.20
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "KamiYomu.CrawlerAgents.MangaFire", "KamiYomu.CrawlerAgents.MangaFire\KamiYomu.CrawlerAgents.MangaFire.csproj", "{4FD5A5D8-FDBB-86D4-1A07-C72A6C4AB345}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Piman.CrawlerAgents.MangaFire", "Piman.CrawlerAgents.MangaFire\Piman.CrawlerAgents.MangaFire.csproj", "{4FD5A5D8-FDBB-86D4-1A07-C72A6C4AB345}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "KamiYomu.CrawlerAgents.ConsoleApp", "KamiYomu.CrawlerAgents.ConsoleApp\KamiYomu.CrawlerAgents.ConsoleApp.csproj", "{4AC18876-E003-9996-347B-48215310AA02}"
 EndProject
