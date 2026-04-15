@@ -1,6 +1,6 @@
 ﻿using KamiYomu.CrawlerAgents.Core;
 using KamiYomu.CrawlerAgents.Core.Catalog;
-using KamiYomu.CrawlerAgents.MangaFire;
+using Piman.CrawlerAgents.MangaFire;
 using Microsoft.Extensions.Logging;
 using Spectre.Console;
 

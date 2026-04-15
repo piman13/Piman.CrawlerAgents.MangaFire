@@ -15,7 +15,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\KamiYomu.CrawlerAgents.MangaFire\KamiYomu.CrawlerAgents.MangaFire.csproj" />
+    <ProjectReference Include="..\Piman.CrawlerAgents.MangaFire\Piman.CrawlerAgents.MangaFire.csproj" />
   </ItemGroup>
 
 </Project>
