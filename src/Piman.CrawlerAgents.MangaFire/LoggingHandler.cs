@@ -4,7 +4,7 @@ using System.Threading.Tasks;
 
 using Microsoft.Extensions.Logging;
 
-namespace KamiYomu.CrawlerAgents.MangaDex;
+namespace Piman.CrawlerAgents.MangaFire;
 
 public class LoggingHandler(ILogger logger, HttpMessageHandler innerHandler) : DelegatingHandler(innerHandler)
 {

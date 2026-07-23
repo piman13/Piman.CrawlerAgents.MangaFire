@@ -1,6 +1,6 @@
 using KamiYomu.CrawlerAgents.Core;
 using KamiYomu.CrawlerAgents.Core.Catalog;
-using KamiYomu.CrawlerAgents.MangaDex;
+using Piman.CrawlerAgents.MangaFire;
 
 using Microsoft.Extensions.Logging;
 
@@ -19,10 +19,10 @@ Dictionary<string, object> options = new()
     { "Language", "fr" },
 
 };
-ICrawlerAgent crawler = new MangaDexCrawlerAgent(options);
+ICrawlerAgent crawler = new MangaFireCrawlerAgent(options);
 List<(string Method, bool Success, string Message)> results = [];
 
-PagedResult<Manga> mangaResult = await crawler.SearchAsync("shrink", new PaginationOptions(0, 30), CancellationToken.None);
+PagedResult<Manga> mangaResult = await crawler.SearchAsync("demon slayer", new PaginationOptions(0, 30), CancellationToken.None);
 #endregion
 
 #region Test GetFaviconAsync
