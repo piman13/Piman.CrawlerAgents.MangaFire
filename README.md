@@ -1,1 +1,1 @@
-# KamiYomu Crawler Agent — MangaDex
+# KamiYomu Crawler Agent — mangafire.to
