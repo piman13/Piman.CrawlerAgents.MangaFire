@@ -15,7 +15,7 @@ using KamiYomu.CrawlerAgents.Core.Catalog.Builders;
 using KamiYomu.CrawlerAgents.Core.Catalog.Definitions;
 using KamiYomu.CrawlerAgents.Core.Inputs;
 
-using Microsoft.Extensions.Logging;
+//using Microsoft.Extensions.Logging;
 
 
 
@@ -142,11 +142,10 @@ public class MangaFireCrawlerAgent : AbstractCrawlerAgent, ICrawlerAgent
 
         //maintain order like their js to hide better
         queryBuilder.Append($"&order%5Brelevance%5D=desc");
-        //queryBuilder.Append($"&page={paginationOptions.OffSet + 1}");//not right
         queryBuilder.Append($"&page={pageNumber}");
         queryBuilder.Append($"&limit={paginationOptions.Limit}");
 
-        Logger.LogInformation("queryBuilder {queryBuilder}", queryBuilder.ToString());
+        //Logger.LogInformation("queryBuilder {queryBuilder}", queryBuilder.ToString());
 
         HttpRequestMessage request = new(HttpMethod.Get, queryBuilder.ToString());
         HttpResponseMessage response = await _httpClient.Value.SendAsync(request, cancellationToken);
@@ -160,9 +159,9 @@ public class MangaFireCrawlerAgent : AbstractCrawlerAgent, ICrawlerAgent
         foreach (JsonNode item in rootNode["items"]?.AsArray() ?? [])
         {
             Manga manga = ConvertToManga(item);
-            if (!string.IsNullOrEmpty(manga?.Title))//why compute twice check if manga can just be added to list
+            if (!string.IsNullOrEmpty(manga?.Title))
             {
-                mangaList.Add(ConvertToManga(item));
+                mangaList.Add(manga);
             }
 
         }
@@ -180,7 +179,7 @@ public class MangaFireCrawlerAgent : AbstractCrawlerAgent, ICrawlerAgent
             return null;
         }
 
-        Logger.LogInformation("id: {var}", id);
+        //Logger.LogInformation("id: {var}", id);
 
         StringBuilder queryBuilder = new StringBuilder()
        .Append($"/api/titles/{id}");
@@ -218,7 +217,7 @@ public class MangaFireCrawlerAgent : AbstractCrawlerAgent, ICrawlerAgent
                                //.Append($"&limit={paginationOptions.Limit}");//overrided as 300 gets blocked
                                .Append($"&limit=20");
 
-        Logger.LogInformation("queryBuilder {queryBuilder}", queryBuilder.ToString());
+        //Logger.LogInformation("queryBuilder {queryBuilder}", queryBuilder.ToString());
 
         HttpRequestMessage request = new(HttpMethod.Get, queryBuilder.ToString());
         HttpResponseMessage response = await _httpClient.Value.SendAsync(request, cancellationToken);
@@ -230,16 +229,16 @@ public class MangaFireCrawlerAgent : AbstractCrawlerAgent, ICrawlerAgent
         int total = ((rootNode["meta"])?["total"]).GetValue<int>();
         List<Chapter> chapters = [];
 
-        Logger.LogInformation("Json: {var}", rootNode);
+        //Logger.LogInformation("Json: {var}", rootNode);
         if (total != 0)
         {
             foreach (JsonNode item in rootNode["items"]?.AsArray() ?? [])
             {
-                Chapter chapter = ConvertToChapter(manga, item);
-                if (chapter.Pages > 0)
-                {
-                    chapters.Add(chapter);
-                }
+                Chapter chapter = ConvertToChapter(manga, item); //learning lession if no pages remove this
+                ///if (chapter.Pages > 0)
+                //{
+                chapters.Add(chapter);
+                //}
             }
         }
 
@@ -257,40 +256,49 @@ public class MangaFireCrawlerAgent : AbstractCrawlerAgent, ICrawlerAgent
             return null;
         }
 
-        using HttpRequestMessage request = new(HttpMethod.Get, chapter.Uri);
+        var chapterApiUri = new Uri(_baseUri.ToString() + "api/chapters/" + chapter.Id);
+
+        //Logger.LogInformation("chapterapiurl test: {url}", chapterApiUri.ToString());
+
+        using HttpRequestMessage request = new(HttpMethod.Get, chapterApiUri);
         using HttpResponseMessage response = await _httpClient.Value.SendAsync(request, HttpCompletionOption.ResponseHeadersRead, cancellationToken);
 
         _ = response.EnsureSuccessStatusCode();
 
         string json = await response.Content.ReadAsStringAsync();
-        JsonNode rootNode = JsonNode.Parse(json);
+        JsonNode rootNode = JsonNode.Parse(json)["data"];//offset into data node
 
-        string baseUrl = rootNode?["baseUrl"]?.GetValue<string>();
-        JsonNode chapterNode = rootNode?["chapter"];
-        string hash = chapterNode?["hash"]?.GetValue<string>();
-        JsonArray dataArray = chapterNode?["data"]?.AsArray();
+        JsonArray dataArray = rootNode?["pages"]?.AsArray();//prob could go direct but might need data in future
 
-        if (string.IsNullOrEmpty(baseUrl) || string.IsNullOrEmpty(hash) || dataArray is null)
+
+        if (dataArray is null)
         {
             throw new InvalidOperationException("Invalid chapter metadata or missing image data.");
         }
 
-        string parentId = chapter.ParentManga?.Id ?? "unknown";
+        //string parentId = chapter.ParentManga?.Id ?? "unknown";//not needed here
         List<Page> pages = new(dataArray.Count);
 
+        int pageNum = 0;
         foreach (JsonNode item in dataArray)
         {
-            string fileName = item?.ToString();
-            if (!string.IsNullOrEmpty(fileName))
+            Uri uri = new Uri(item?["url"]?.GetValue<string>());
+
+
+            //Logger.LogInformation("imageuri: {url}", uri.ToString());
+            //Logger.LogInformation("pagenum: {url}", pageNum);
+
+            if (!string.IsNullOrEmpty(uri.ToString()))
             {
-                Uri uri = new($"{baseUrl}/data/{hash}/{fileName}");
+                //Uri uri = new($"{baseUrl}/data/{hash}/{fileName}");
                 PageBuilder pageBuilder = PageBuilder.Create()
                     .WithChapterId(chapter.ParentManga.Id)
                     .WithId(DateTime.UtcNow.Ticks.ToString())
                     .WithImageUrl(uri)
-                    .WithPageNumber(ExtractPageNumber(fileName))
+                    .WithPageNumber(pageNum)
                     .WithParentChapter(chapter);
                 pages.Add(pageBuilder.Build());
+                pageNum++;
             }
         }
 
@@ -314,7 +322,7 @@ public class MangaFireCrawlerAgent : AbstractCrawlerAgent, ICrawlerAgent
             return null;
         }
 
-        Logger.LogInformation("Json: {var}", item);
+        //Logger.LogInformation("Json: {var}", item);
 
         ///////////////////////////////////////////////////TITLE///////////////////////////////////////////////////////////////////////////
         string title = item?["title"].ToString();
@@ -333,12 +341,12 @@ public class MangaFireCrawlerAgent : AbstractCrawlerAgent, ICrawlerAgent
                 var alt = part.ToString();
                 if (!string.IsNullOrEmpty(alt))
                     altTitleDict[$"Alt{i++}"] = alt;
-                Logger?.LogInformation("Alt_title: {alt}", alt);
+                //Logger?.LogInformation("Alt_title: {alt}", alt);
             }
         }
 
         ///////////////////////////////////////////////////DESCRIPTION/////////////////////////////////////////////////////////////////////
-        // DESCRIPTION
+        // localized description arn't available atm
         string description = item?["synopsisHtml"]?.ToString();
         //string localizedDescription = descriptionObj?[_language]?.ToString();
         //string localizedDescription = descriptionObj?.FirstOrDefault(kvp => !string.IsNullOrEmpty(kvp.Value?.ToString())).Value?.ToString();
@@ -416,7 +424,7 @@ public class MangaFireCrawlerAgent : AbstractCrawlerAgent, ICrawlerAgent
         string contentRating = item?["contentRating"]?.ToString();
         bool isFamilySafe = string.IsNullOrWhiteSpace(contentRating) || !unsafeRatings.Contains(contentRating, StringComparer.OrdinalIgnoreCase);
 
-
+        /* debug
         Logger.LogInformation("title: {var}", title);
         Logger.LogInformation("authls: {var}", authorList);
         Logger.LogInformation("artls: {var}", artistList);
@@ -425,7 +433,7 @@ public class MangaFireCrawlerAgent : AbstractCrawlerAgent, ICrawlerAgent
         Logger.LogInformation("year: {var}", item?["year"]?.GetValue<int?>() ?? 0);
         Logger.LogInformation("coverurl: {var}", coverUrl);
         Logger.LogInformation("coverfile: {var}", coverFileName);
-        Logger.LogInformation("lastchap: {var}", lastChapter);
+        Logger.LogInformation("lastchap: {var}", lastChapter);*/
 
 
 
@@ -466,42 +474,24 @@ public class MangaFireCrawlerAgent : AbstractCrawlerAgent, ICrawlerAgent
 
         decimal chapterNum = item?["number"]?.GetValue<int>() ?? 0m;
 
-        decimal volume = 0;
-
+        /* debug
         Logger.LogInformation("id: {var}", id);
         Logger.LogInformation("id type: {var}", id.GetType());
         Logger.LogInformation("title: {var}", title);
-
         Logger.LogInformation("ChNumber: {var}", chapterNum);
         Logger.LogInformation("time: {var}", releaseDate);
-        Logger.LogInformation("lang: {var}", item?["language"]?.ToString());
-
-        Logger.LogInformation("pmanga: {var}", manga == null);
+        Logger.LogInformation("lang: {var}", item?["language"]?.ToString());*/
 
 
         ChapterBuilder builder = ChapterBuilder.Create()
-            .WithParentManga(manga)
-            .WithId("mangaid")
-            .WithTitle("manga")
-            .WithVolume(1)//missing but they have volume data they use for some other crap check in furture if added
-            .WithNumber(1)
-            .WithUri(new Uri("https://exsample.com"));
+                                    .WithParentManga(manga)
+                                    .WithId(id)
+                                    .WithTitle(title)
+                                    //.WithVolume(volume)//missing but they have volume data they use for some other crap check in future if added
+                                    .WithNumber(chapterNum)
+                                    .WithReleaseDate(releaseDate.DateTime)
+                                    .WithUri(new Uri(manga.WebSiteUrl + "/chapter/" + id));
 
-        // ChapterBuilder builder = ChapterBuilder.Create()
-        //                             .WithParentManga(manga)
-        //                             .WithId(id)
-        //                             .WithTitle(title)
-        //                             .WithVolume(volume)//missing but they have volume data they use for some other crap check in furture if added
-        //                             .WithNumber(chapterNum)
-        //                             .WithUri(new Uri("https://exsample.com"));
-        //                             //.WithReleaseDate(releaseDate.DateTime)
-        //                             //.WithTranslatedLanguage(item?["language"]?.ToString() ?? "");
-        //                             //.WithPages(attributes?["pages"]?.GetValue<int?>().GetValueOrDefault(0) ?? 0)
-        //                             //.WithUri(new Uri($"at-home/server/{item?["id"]?.GetValue<string>()}?forcePort443=false", UriKind.Relative));
-
-        Logger.LogInformation("null test: {builder}", builder == null);
-        //var builtmanga = builder.Build();
-        //Logger.LogInformation("null test: {builder}", builtmanga?.Count());
 
         return builder.Build();
     }
